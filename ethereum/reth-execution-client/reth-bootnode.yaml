@@ -14,8 +14,8 @@ serviceMonitor:
 
 extraVolumes:
   - name: network-configs
-    configMap:
-      name: network-configs
+    persistentVolumeClaim:
+      claimName: network-configs
   - name: bootnode-keys
     secret:
       secretName: bootnode-keys
