@@ -23,3 +23,6 @@ spec:
     repoURL: https://github.com/PierreBesson/private-ethereum-testnet.git
     targetRevision: main
     path: .
+    kustomize:
+      images:
+      - line/kubectl-kustomize:latest
