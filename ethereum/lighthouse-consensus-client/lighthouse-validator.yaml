@@ -1,0 +1,31 @@
+replicas: 1
+image:
+  repository: ethpandaops/lighthouse
+  tag: unstable-4e675cf
+persistence:
+  enabled: true
+mode: validator
+
+extraArgs:
+  - --debug-level=debug
+  - --testnet-dir /network-configs
+  - --validators-dir=/validator-keys/keys
+  - --secrets-dir=/validator-keys/secrets
+  - --init-slashing-protection
+  - --beacon-nodes=http://lighthouse-beacon:5052
+  - --suggested-fee-recipient=0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  - --graffiti=1-reth-lighthouse
+
+extraVolumes:
+  - name: network-configs
+    persistentVolumeClaim:
+      claimName: network-configs
+  - name: validator-keys
+    persistentVolumeClaim:
+      claimName: validator-keys
+
+extraVolumeMounts:
+  - name: network-configs
+    mountPath: /network-configs
+  - name: validator-keys
+    mountPath: /validator-keys

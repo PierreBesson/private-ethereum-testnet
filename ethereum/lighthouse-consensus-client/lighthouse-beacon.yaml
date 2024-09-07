@@ -1,0 +1,59 @@
+replicas: 1
+image:
+  repository: ethpandaops/lighthouse
+  tag: unstable-4e675cf
+persistence:
+  enabled: true
+
+extraArgs:
+  - --debug-level=info
+  - --testnet-dir /network-configs
+  - --http-allow-sync-stalled
+  - --allow-insecure-genesis-sync
+  - --validator-monitor-auto
+  - --enable-private-discovery
+  - --slots-per-restore-point=32
+  - --disable-packet-filter
+  - --execution-endpoint http://reth-bootnode:8551
+  - --jwt-secrets /keys/jwt.hex
+  - --suggested-fee-recipient 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+
+extraVolumes:
+  - name: network-configs
+    persistentVolumeClaim:
+      claimName: network-configs
+  - name: reth-auth-jwt
+    secret:
+      secretName: reth-bootnode-jwt
+
+extraVolumeMounts:
+  - name: network-configs
+    mountPath: /network-configs
+  - name: reth-auth-jwt
+    mountPath: /keys
+
+
+# Needs be overriden as the helm chart force use of the `jwt` property
+# and cannot load it from a secret
+# a contribution to upstream helm repo could improve this
+defaultBeaconCommandTemplate: |
+  - sh
+  - -ac
+  - >
+    exec lighthouse
+    beacon_node
+    --datadir=/data
+    --disable-upnp
+    --disable-enr-auto-update
+    --listen-address=0.0.0.0
+    --port={{ include "lighthouse.p2pPort" . }}
+    --discovery-port={{ include "lighthouse.p2pPort" . }}
+    --http
+    --http-address=0.0.0.0
+    --http-port={{ .Values.httpPort }}
+    --metrics
+    --metrics-address=0.0.0.0
+    --metrics-port={{ .Values.metricsPort }}
+  {{- range .Values.extraArgs }}
+    {{ tpl . $ }}
+  {{- end }}

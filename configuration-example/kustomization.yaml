@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+configMapGenerator:
+- name: monitoring
+  options:
+    disableNameSuffixHash: true
+  literals:
+    - "LOKI_URL=https://logs-prod-012.grafana.net/loki/api/v1/push"
+    - "LOKI_USERNAME=967777"
+    - "PROM_URL=https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom/push"
+    - "PROM_USERNAME=1736103"
+
+secretGenerator:
+- name: credentials
+  options:
+    disableNameSuffixHash: true
+  literals:
+    - "prom_password=***"
+    - "loki_password=***"

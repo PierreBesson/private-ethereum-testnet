@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+
+helmCharts:
+- releaseName: lighthouse-beacon
+  repo: "https://ethpandaops.github.io/ethereum-helm-charts"
+  name: lighthouse
+  version: 1.1.3
+  additionalValuesFiles:
+  - lighthouse-beacon.yaml
+- releaseName: lighthouse-validator
+  repo: "https://ethpandaops.github.io/ethereum-helm-charts"
+  name: lighthouse
+  version: 1.1.3
+  additionalValuesFiles:
+  - lighthouse-validator.yaml

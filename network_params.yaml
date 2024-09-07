@@ -1,0 +1,7 @@
+participants:
+  - el_type: reth
+    cl_type: lighthouse
+network_params:
+  network_id: "1337"
+additional_services:
+  - blockscout

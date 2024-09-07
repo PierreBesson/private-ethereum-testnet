@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+configMapGenerator:
+  - name: alloy-config
+    files:
+      - config.alloy
+    options:
+      disableNameSuffixHash: true
+
+helmCharts:
+- releaseName: alloy
+  repo: "https://grafana.github.io/helm-charts"
+  name: alloy
+  includeCRDs: true
+  version: 0.6.0
+  additionalValuesFiles:
+    - alloy.yaml

@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+configMapGenerator:
+- name: network-configs
+  options:
+    disableNameSuffixHash: true
+  files:
+    - configuration/network-configs/genesis.json
+
+resources:
+- ethereum/reth-execution-client
+- ethereum/lighthouse-consensus-client

@@ -1,0 +1,27 @@
+replicas: 1
+image:
+  repository: ghcr.io/paradigmxyz/reth
+  tag: v1.0.6
+persistence:
+  enabled: true
+extraArgs:
+  - --chain /network-configs/genesis.json
+  - --p2p-secret-key /keys/reth-bootnode-p2p.key
+
+# Enable Prometheus metrics collection
+serviceMonitor:
+  enabled: false
+
+extraVolumes:
+  - name: network-configs
+    configMap:
+      name: network-configs
+  - name: bootnode-keys
+    secret:
+      secretName: bootnode-keys
+
+extraVolumeMounts:
+  - name: network-configs
+    mountPath: /network-configs
+  - name: bootnode-keys
+    mountPath: /keys

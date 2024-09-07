@@ -1,0 +1,867 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kurtosistech.com/ports: tcp-discovery:9000/TCP/-2m0s,udp-discovery:9000/UDP/-2m0s,http:4000/TCP/http-2m0s,metrics:5054/TCP/http-2m0s
+    creationTimestamp: "2024-08-13T08:46:38Z"
+    labels:
+      kurtosistech.com.custom/ethereum-package.client: lighthouse
+      kurtosistech.com.custom/ethereum-package.client-image: ethpandaops-lighthouse_stable
+      kurtosistech.com.custom/ethereum-package.client-type: beacon
+      kurtosistech.com.custom/ethereum-package.connected-client: geth
+      kurtosistech.com.custom/ethereum-package.sha256: ""
+      kurtosistech.com/app-id: kurtosis
+      kurtosistech.com/enclave-id: ec9e85757bf64c5f8330315bcb2000f1
+      kurtosistech.com/guid: 812dcd4239654a68a02b7db513bb96a8
+      kurtosistech.com/id: cl-1-lighthouse-geth
+      kurtosistech.com/resource-type: user-service
+    name: cl-1-lighthouse-geth
+    namespace: kt-little-atoll
+    resourceVersion: "1180"
+    uid: 06a15020-2182-494a-a8fa-08d5e9387d57
+  spec:
+    containers:
+    - args:
+      - lighthouse
+      - beacon_node
+      - --debug-level=info
+      - --datadir=/data/lighthouse/beacon-data
+      - --disable-enr-auto-update
+      - --enr-address=10.96.124.12
+      - --enr-udp-port=9000
+      - --enr-tcp-port=9000
+      - --listen-address=0.0.0.0
+      - --port=9000
+      - --http
+      - --http-address=0.0.0.0
+      - --http-port=4000
+      - --http-allow-sync-stalled
+      - --slots-per-restore-point=32
+      - --disable-packet-filter
+      - --execution-endpoints=http://10.96.92.47:8551
+      - --jwt-secrets=/jwt/jwtsecret
+      - --suggested-fee-recipient=0x8943545177806ED17B9F23F0a21ee5948eCaa776
+      - --metrics
+      - --metrics-address=0.0.0.0
+      - --metrics-allow-origin=*
+      - --metrics-port=5054
+      - --enable-private-discovery
+      - --testnet-dir=/network-configs
+      env:
+      - name: RUST_BACKTRACE
+        value: full
+      image: ethpandaops/lighthouse:stable
+      imagePullPolicy: IfNotPresent
+      name: user-service-container
+      ports:
+      - containerPort: 9000
+        name: udp-discovery
+        protocol: UDP
+      - containerPort: 4000
+        name: http
+        protocol: TCP
+      - containerPort: 5054
+        name: metrics
+        protocol: TCP
+      - containerPort: 9000
+        name: tcp-discovery
+        protocol: TCP
+      resources:
+        limits:
+          cpu: "1"
+          memory: 1024M
+        requests:
+          cpu: 50m
+          memory: 256M
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /network-configs
+        name: files-artifact-expansion
+        subPath: "0"
+      - mountPath: /jwt
+        name: files-artifact-expansion
+        subPath: "1"
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-kpphv
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    initContainers:
+    - env:
+      - name: SERIALIZED_ARGS
+        value: '{"apiContainerIpAddress":"10.96.44.202","apiContainerPort":7443,"filesArtifactExpansions":[{"filesIdentifier":"el_cl_genesis_data","dirPathToExpandTo":"/files-artifacts/fa13f17a795240a484c8111ecdf72ffa"},{"filesIdentifier":"jwt_file","dirPathToExpandTo":"/files-artifacts/d4dcc0dd040242c59e16c5a1be9f6742"}]}'
+      image: kurtosistech/files-artifacts-expander:1.0.0
+      imagePullPolicy: IfNotPresent
+      name: files-artifact-expander
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /files-artifacts/fa13f17a795240a484c8111ecdf72ffa
+        name: files-artifact-expansion
+        subPath: "0"
+      - mountPath: /files-artifacts/d4dcc0dd040242c59e16c5a1be9f6742
+        name: files-artifact-expansion
+        subPath: "1"
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-kpphv
+        readOnly: true
+    nodeName: kind-control-plane
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Never
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - emptyDir: {}
+      name: files-artifact-expansion
+    - name: kube-api-access-kpphv
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:40Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:40Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:49Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:49Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:38Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://a2631d2d40a51824a58b26a873fcf58cd0c883b5e53c335d4d7974f74c651b64
+      image: docker.io/ethpandaops/lighthouse:stable
+      imageID: docker.io/ethpandaops/lighthouse@sha256:8e2f40564a56df35a6ea62a01c3085a81bcaf06ec5841fbf7cd84056d8ae166b
+      lastState: {}
+      name: user-service-container
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2024-08-13T08:46:48Z"
+    hostIP: 172.20.0.2
+    hostIPs:
+    - ip: 172.20.0.2
+    initContainerStatuses:
+    - containerID: containerd://169af22e6931fd64588388745b14f915e51acb40cfff7903737cca7d0a254482
+      image: docker.io/kurtosistech/files-artifacts-expander:1.0.0
+      imageID: docker.io/kurtosistech/files-artifacts-expander@sha256:7fb38e87a0b808654c1f41c5b878234131c959b9390e349dde8cd39ed4eee7bc
+      lastState: {}
+      name: files-artifact-expander
+      ready: true
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          containerID: containerd://169af22e6931fd64588388745b14f915e51acb40cfff7903737cca7d0a254482
+          exitCode: 0
+          finishedAt: "2024-08-13T08:46:39Z"
+          reason: Completed
+          startedAt: "2024-08-13T08:46:39Z"
+    phase: Running
+    podIP: 10.244.0.14
+    podIPs:
+    - ip: 10.244.0.14
+    qosClass: Burstable
+    startTime: "2024-08-13T08:46:38Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kurtosistech.com/ports: tcp-discovery:30303/TCP/-2m0s,udp-discovery:30303/UDP/-2m0s,engine-rpc:8551/TCP/-2m0s,rpc:8545/TCP/-2m0s,ws:8546/TCP/-2m0s,metrics:9001/TCP/http-2m0s
+    creationTimestamp: "2024-08-13T08:46:26Z"
+    labels:
+      kurtosistech.com.custom/ethereum-package.client: geth
+      kurtosistech.com.custom/ethereum-package.client-image: ethereum-client-go_latest
+      kurtosistech.com.custom/ethereum-package.client-type: execution
+      kurtosistech.com.custom/ethereum-package.connected-client: lighthouse
+      kurtosistech.com.custom/ethereum-package.sha256: ""
+      kurtosistech.com/app-id: kurtosis
+      kurtosistech.com/enclave-id: ec9e85757bf64c5f8330315bcb2000f1
+      kurtosistech.com/guid: c4adb0a2142c45b79e524b01004637e1
+      kurtosistech.com/id: el-1-geth-lighthouse
+      kurtosistech.com/resource-type: user-service
+    name: el-1-geth-lighthouse
+    namespace: kt-little-atoll
+    resourceVersion: "1137"
+    uid: 7f122f09-f536-4019-89b0-afca1cab1d49
+  spec:
+    containers:
+    - args:
+      - geth init --datadir=/data/geth/execution-data /network-configs/genesis.json
+        && geth    --networkid=3151908 --verbosity=3 --datadir=/data/geth/execution-data
+        --http --http.addr=0.0.0.0 --http.vhosts=* --http.corsdomain=* --http.api=admin,engine,net,eth,web3,debug
+        --ws --ws.addr=0.0.0.0 --ws.port=8546 --ws.api=admin,engine,net,eth,web3,debug
+        --ws.origins=* --allow-insecure-unlock --nat=extip:10.96.92.47 --verbosity=3
+        --authrpc.port=8551 --authrpc.addr=0.0.0.0 --authrpc.vhosts=* --authrpc.jwtsecret=/jwt/jwtsecret
+        --syncmode=full --rpc.allow-unprotected-txs --metrics --metrics.addr=0.0.0.0
+        --metrics.port=9001 --discovery.port=30303 --port=30303
+      command:
+      - sh
+      - -c
+      image: ethereum/client-go:latest
+      imagePullPolicy: IfNotPresent
+      name: user-service-container
+      ports:
+      - containerPort: 30303
+        name: tcp-discovery
+        protocol: TCP
+      - containerPort: 30303
+        name: udp-discovery
+        protocol: UDP
+      - containerPort: 8551
+        name: engine-rpc
+        protocol: TCP
+      - containerPort: 8545
+        name: rpc
+        protocol: TCP
+      - containerPort: 8546
+        name: ws
+        protocol: TCP
+      - containerPort: 9001
+        name: metrics
+        protocol: TCP
+      resources:
+        limits:
+          cpu: "1"
+          memory: 1024M
+        requests:
+          cpu: 300m
+          memory: 512M
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /network-configs
+        name: files-artifact-expansion
+        subPath: "0"
+      - mountPath: /jwt
+        name: files-artifact-expansion
+        subPath: "1"
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-6cg45
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    initContainers:
+    - env:
+      - name: SERIALIZED_ARGS
+        value: '{"apiContainerIpAddress":"10.96.44.202","apiContainerPort":7443,"filesArtifactExpansions":[{"filesIdentifier":"el_cl_genesis_data","dirPathToExpandTo":"/files-artifacts/167f2195d250489487327739ab0e56b4"},{"filesIdentifier":"jwt_file","dirPathToExpandTo":"/files-artifacts/0e497dbf3ac947698d97dea4ae4b39cc"}]}'
+      image: kurtosistech/files-artifacts-expander:1.0.0
+      imagePullPolicy: IfNotPresent
+      name: files-artifact-expander
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /files-artifacts/167f2195d250489487327739ab0e56b4
+        name: files-artifact-expansion
+        subPath: "0"
+      - mountPath: /files-artifacts/0e497dbf3ac947698d97dea4ae4b39cc
+        name: files-artifact-expansion
+        subPath: "1"
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-6cg45
+        readOnly: true
+    nodeName: kind-control-plane
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Never
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - emptyDir: {}
+      name: files-artifact-expansion
+    - name: kube-api-access-6cg45
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:28Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:28Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:36Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:36Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:26Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://fdbe629068a5c6cd935c92f7508f3f6dcd9b9fbd106d596892b98b1dcfc0f0f3
+      image: docker.io/ethereum/client-go:latest
+      imageID: docker.io/ethereum/client-go@sha256:5b566f8ee4e939275d1e8ffe5d5732e28a261a84dd899b54cdb6d735b0b3ccf1
+      lastState: {}
+      name: user-service-container
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2024-08-13T08:46:35Z"
+    hostIP: 172.20.0.2
+    hostIPs:
+    - ip: 172.20.0.2
+    initContainerStatuses:
+    - containerID: containerd://5a3c2dd9596f53c564ed6dcffce9c430b06da75f1b89ec344e8188e12d98bcdd
+      image: docker.io/kurtosistech/files-artifacts-expander:1.0.0
+      imageID: docker.io/kurtosistech/files-artifacts-expander@sha256:7fb38e87a0b808654c1f41c5b878234131c959b9390e349dde8cd39ed4eee7bc
+      lastState: {}
+      name: files-artifact-expander
+      ready: true
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          containerID: containerd://5a3c2dd9596f53c564ed6dcffce9c430b06da75f1b89ec344e8188e12d98bcdd
+          exitCode: 0
+          finishedAt: "2024-08-13T08:46:27Z"
+          reason: Completed
+          startedAt: "2024-08-13T08:46:27Z"
+    phase: Running
+    podIP: 10.244.0.13
+    podIPs:
+    - ip: 10.244.0.13
+    qosClass: Burstable
+    startTime: "2024-08-13T08:46:26Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2024-08-13T08:42:57Z"
+    labels:
+      kurtosistech.com/app-id: kurtosis
+      kurtosistech.com/enclave-id: ec9e85757bf64c5f8330315bcb2000f1
+      kurtosistech.com/resource-type: api-container
+    name: kurtosis-api
+    namespace: kt-little-atoll
+    resourceVersion: "698"
+    uid: c234cb3d-c68b-4564-8598-5a7a196cc1a5
+  spec:
+    containers:
+    - env:
+      - name: OWN_IP_ADDRESS
+        value: 10.96.44.202
+      - name: SERIALIZED_ARGS
+        value: '{"version":"1.0.0","logLevel":"debug","grpcListenPortNum":7443,"enclaveUuid":"ec9e85757bf64c5f8330315bcb2000f1","enclaveDataVolume":"/kurtosis-data","kurtosisBackendType":"kubernetes","kurtosisBackendConfig":{"StorageClass":"standard"},"enclaveEnvVars":"{}","isProductionEnclave":false,"metricsUserID":"0f506fea0edb5a3d125fc299864f89c01f6c358fe2a35250599fd5052674320c","didUserAcceptSendingMetrics":true,"is_ci":false,"cloud_user_id":"","cloud_instance_id":""}'
+      - name: API_CONTAINER_OWN_NAMESPACE_NAME
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.namespace
+      image: kurtosistech/core:1.0.0
+      imagePullPolicy: IfNotPresent
+      name: kurtosis-core-api
+      ports:
+      - containerPort: 7443
+        name: grpc
+        protocol: TCP
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /kurtosis-data
+        name: enclave-data
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-4vcxk
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    imagePullSecrets:
+    - name: kurtosis-image
+    nodeName: kind-control-plane
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: OnFailure
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: kurtosis-api
+    serviceAccountName: kurtosis-api
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: enclave-data
+      persistentVolumeClaim:
+        claimName: enclave-data
+    - name: kube-api-access-4vcxk
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:43:12Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:43:02Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:43:12Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:43:12Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:43:02Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://68bbb18880f125fd9936a2eff0fd110820e6667bcee2761a5118e173dd5743be
+      image: docker.io/kurtosistech/core:1.0.0
+      imageID: docker.io/kurtosistech/core@sha256:634092bc72f22e1e879773bf7fe0654ac74f199d41d0b322725f498a0a2a9cbd
+      lastState: {}
+      name: kurtosis-core-api
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2024-08-13T08:43:11Z"
+    hostIP: 172.20.0.2
+    hostIPs:
+    - ip: 172.20.0.2
+    phase: Running
+    podIP: 10.244.0.7
+    podIPs:
+    - ip: 10.244.0.7
+    qosClass: BestEffort
+    startTime: "2024-08-13T08:43:02Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kurtosistech.com/ports: ""
+    creationTimestamp: "2024-08-13T08:43:17Z"
+    labels:
+      kurtosistech.com/app-id: kurtosis
+      kurtosistech.com/enclave-id: ec9e85757bf64c5f8330315bcb2000f1
+      kurtosistech.com/guid: 6497b64e291048b9bea24013abbf524d
+      kurtosistech.com/id: validator-key-generation-cl-validator-keystore
+      kurtosistech.com/resource-type: user-service
+    name: validator-key-generation-cl-validator-keystore
+    namespace: kt-little-atoll
+    resourceVersion: "747"
+    uid: edbbfa4d-eb31-471d-96b3-400fc8fc6125
+  spec:
+    containers:
+    - command:
+      - sleep
+      - "99999"
+      image: protolambda/eth2-val-tools:latest
+      imagePullPolicy: IfNotPresent
+      name: user-service-container
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-874tf
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    initContainers:
+    - env:
+      - name: SERIALIZED_ARGS
+        value: '{"apiContainerIpAddress":"10.96.44.202","apiContainerPort":7443,"filesArtifactExpansions":[]}'
+      image: kurtosistech/files-artifacts-expander:1.0.0
+      imagePullPolicy: IfNotPresent
+      name: files-artifact-expander
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-874tf
+        readOnly: true
+    nodeName: kind-control-plane
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Never
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - emptyDir: {}
+      name: files-artifact-expansion
+    - name: kube-api-access-874tf
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:43:23Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:43:24Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:43:31Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:43:31Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:43:17Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://41c4d8a6f2675499185ec995c09caeb380ab7b1dcc45134342e6f41ace48acc3
+      image: docker.io/protolambda/eth2-val-tools:latest
+      imageID: docker.io/protolambda/eth2-val-tools@sha256:0d0f350b6a57782a9b5165110bab34193298191110348b563e41eaa6eceb6aaf
+      lastState: {}
+      name: user-service-container
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2024-08-13T08:43:31Z"
+    hostIP: 172.20.0.2
+    hostIPs:
+    - ip: 172.20.0.2
+    initContainerStatuses:
+    - containerID: containerd://a86a378055668d7c6d9ba6802facadcbd1cb3f2e889e7a0b7edb5cb57b00e778
+      image: docker.io/kurtosistech/files-artifacts-expander:1.0.0
+      imageID: docker.io/kurtosistech/files-artifacts-expander@sha256:7fb38e87a0b808654c1f41c5b878234131c959b9390e349dde8cd39ed4eee7bc
+      lastState: {}
+      name: files-artifact-expander
+      ready: true
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          containerID: containerd://a86a378055668d7c6d9ba6802facadcbd1cb3f2e889e7a0b7edb5cb57b00e778
+          exitCode: 0
+          finishedAt: "2024-08-13T08:43:22Z"
+          reason: Completed
+          startedAt: "2024-08-13T08:43:22Z"
+    phase: Running
+    podIP: 10.244.0.8
+    podIPs:
+    - ip: 10.244.0.8
+    qosClass: BestEffort
+    startTime: "2024-08-13T08:43:17Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kurtosistech.com/ports: metrics:8080/TCP/http-2m0s
+    creationTimestamp: "2024-08-13T08:46:51Z"
+    labels:
+      kurtosistech.com.custom/ethereum-package.client: lighthouse
+      kurtosistech.com.custom/ethereum-package.client-image: ethpandaops-lighthouse_stable
+      kurtosistech.com.custom/ethereum-package.client-type: validator
+      kurtosistech.com.custom/ethereum-package.connected-client: lighthouse
+      kurtosistech.com.custom/ethereum-package.sha256: ""
+      kurtosistech.com/app-id: kurtosis
+      kurtosistech.com/enclave-id: ec9e85757bf64c5f8330315bcb2000f1
+      kurtosistech.com/guid: ad0d3a95f3da43dfbebfbc6a19595738
+      kurtosistech.com/id: vc-1-geth-lighthouse
+      kurtosistech.com/resource-type: user-service
+    name: vc-1-geth-lighthouse
+    namespace: kt-little-atoll
+    resourceVersion: "1213"
+    uid: de4610da-8c2a-41a4-8469-0d6e1b77246d
+  spec:
+    containers:
+    - args:
+      - lighthouse
+      - vc
+      - --debug-level=info
+      - --testnet-dir=/network-configs
+      - --validators-dir=/validator-keys/keys
+      - --secrets-dir=/validator-keys/secrets
+      - --init-slashing-protection
+      - --beacon-nodes=http://10.96.124.12:4000
+      - --suggested-fee-recipient=0x8943545177806ED17B9F23F0a21ee5948eCaa776
+      - --metrics
+      - --metrics-address=0.0.0.0
+      - --metrics-allow-origin=*
+      - --metrics-port=8080
+      - --graffiti=1-geth-lighthouse
+      env:
+      - name: RUST_BACKTRACE
+        value: full
+      image: ethpandaops/lighthouse:stable
+      imagePullPolicy: IfNotPresent
+      name: user-service-container
+      ports:
+      - containerPort: 8080
+        name: metrics
+        protocol: TCP
+      resources:
+        limits:
+          cpu: 300m
+          memory: 512M
+        requests:
+          cpu: 50m
+          memory: 128M
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /network-configs
+        name: files-artifact-expansion
+        subPath: "0"
+      - mountPath: /validator-keys
+        name: files-artifact-expansion
+        subPath: "1"
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-sf9cf
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    initContainers:
+    - env:
+      - name: SERIALIZED_ARGS
+        value: '{"apiContainerIpAddress":"10.96.44.202","apiContainerPort":7443,"filesArtifactExpansions":[{"filesIdentifier":"el_cl_genesis_data","dirPathToExpandTo":"/files-artifacts/535a55b3b4654a628d8388bf5c2c0f56"},{"filesIdentifier":"1-lighthouse-geth-0-63-0","dirPathToExpandTo":"/files-artifacts/2b194ed5073b4d3497c50f6f654ce1c6"}]}'
+      image: kurtosistech/files-artifacts-expander:1.0.0
+      imagePullPolicy: IfNotPresent
+      name: files-artifact-expander
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /files-artifacts/535a55b3b4654a628d8388bf5c2c0f56
+        name: files-artifact-expansion
+        subPath: "0"
+      - mountPath: /files-artifacts/2b194ed5073b4d3497c50f6f654ce1c6
+        name: files-artifact-expansion
+        subPath: "1"
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-sf9cf
+        readOnly: true
+    nodeName: kind-control-plane
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Never
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - emptyDir: {}
+      name: files-artifact-expansion
+    - name: kube-api-access-sf9cf
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:52Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:54Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:55Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:55Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2024-08-13T08:46:51Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://cad66b5bbf479e54066d66a9f024489ceb0b6f88ab0c364c18cfab1480ed26fb
+      image: docker.io/ethpandaops/lighthouse:stable
+      imageID: docker.io/ethpandaops/lighthouse@sha256:8e2f40564a56df35a6ea62a01c3085a81bcaf06ec5841fbf7cd84056d8ae166b
+      lastState: {}
+      name: user-service-container
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2024-08-13T08:46:54Z"
+    hostIP: 172.20.0.2
+    hostIPs:
+    - ip: 172.20.0.2
+    initContainerStatuses:
+    - containerID: containerd://b62a54c51d11c957b08278f6fc3a4ae603e0ebc3fa69df1810d3fea0e2ae17f3
+      image: docker.io/kurtosistech/files-artifacts-expander:1.0.0
+      imageID: docker.io/kurtosistech/files-artifacts-expander@sha256:7fb38e87a0b808654c1f41c5b878234131c959b9390e349dde8cd39ed4eee7bc
+      lastState: {}
+      name: files-artifact-expander
+      ready: true
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          containerID: containerd://b62a54c51d11c957b08278f6fc3a4ae603e0ebc3fa69df1810d3fea0e2ae17f3
+          exitCode: 0
+          finishedAt: "2024-08-13T08:46:52Z"
+          reason: Completed
+          startedAt: "2024-08-13T08:46:51Z"
+    phase: Running
+    podIP: 10.244.0.15
+    podIPs:
+    - ip: 10.244.0.15
+    qosClass: Burstable
+    startTime: "2024-08-13T08:46:51Z"
+kind: List
+metadata:
+  resourceVersion: ""
