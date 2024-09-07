@@ -2,7 +2,7 @@
 
 ## Documentation
 
-The setup is fully documented in this article: 
+The setup is fully documented in this article: [pierre-besson.fr/articles/2024/09/07/private-ethereum-testnet.html](https://pierre-besson.fr/articles/2024/09/07/private-ethereum-testnet.html)
 
 ## Quickstart
 
