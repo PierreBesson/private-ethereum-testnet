@@ -1,0 +1,25 @@
+# Patch argocd-cm to enable helm with kustomize
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  kustomize.buildOptions: --enable-helm --load-restrictor=LoadRestrictionsNone
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: testnet
+spec:
+  project: default
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://github.com/PierreBesson/private-ethereum-testnet.git
+    targetRevision: main
+    path: .
