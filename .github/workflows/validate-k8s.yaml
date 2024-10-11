@@ -1,0 +1,31 @@
+name: kubectl-validate
+# Controls when the workflow will run
+on:
+  push:
+    branches: [ "v2" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+jobs:
+  k8sManifestsValidation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo content
+        uses: actions/checkout@v3
+        
+      - name: Setup go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          
+      - name: Install kustomize
+        run: curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+
+      - name: Install kubectl-validate
+        run: go install sigs.k8s.io/kubectl-validate@latest
+
+      - name: Render all manifest with kustomize
+        run: kustomize build --enable-helm > manifests.yaml
+
+      - name: Run kubectl-validate
+        run: kubectl-validate ./k8s-manifest/ --version 1.23
