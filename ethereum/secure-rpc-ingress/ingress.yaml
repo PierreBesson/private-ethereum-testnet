@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rpc-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: 192.168.49.2.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: eth-rpc
+                port:
+                  number: 8545
+  tls:
+    - hosts:
+        - "192.168.49.2.nip.io"
+      secretName: local-tls

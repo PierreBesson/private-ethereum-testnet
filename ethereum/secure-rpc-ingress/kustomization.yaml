@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: default
+
+secretGenerator:
+- name: local-tls
+  type: kubernetes.io/tls
+  options:
+    disableNameSuffixHash: true
+  files:
+    - files/tls.crt
+    - files/tls.key
+
+resources:
+- service.yaml
+- ingress.yaml
