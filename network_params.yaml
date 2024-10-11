@@ -3,5 +3,7 @@ participants:
     cl_type: lighthouse
 network_params:
   network_id: "1337"
+  preset: minimal
+  prefunded_accounts: '{"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266": {"balance": "10000ETH"}}'
 additional_services:
   - blockscout
